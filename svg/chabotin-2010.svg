@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW 2017 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="40.5552mm" height="32.5966mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 4055.52 3259.66"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .str2 {stroke:#373435;stroke-width:35.28;stroke-miterlimit:22.9256}
+    .str0 {stroke:#373435;stroke-width:7.62;stroke-miterlimit:22.9256}
+    .str1 {stroke:#373435;stroke-width:35.28;stroke-miterlimit:22.9256}
+    .fil3 {fill:none}
+    .fil1 {fill:#FEFEFE}
+    .fil2 {fill:#373435}
+    .fil0 {fill:#373435;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Capa_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_2189160214336">
+   <g>
+    <path class="fil0" d="M4005.24 1737.66l-4006.22 102.59 -0.9 -35.46 4006.22 -102.59 17.87 20.5 -16.97 14.96zm-0.9 -35.46c9.74,-0.24 17.85,7.49 18.09,17.28 0.24,9.79 -7.45,17.94 -17.19,18.18l-0.9 -35.46zm-176.76 1029.36l159.79 -1014.4 34.84 5.54 -159.79 1014.4 -17.42 14.97 -17.42 -20.51zm34.84 5.54c-1.52,9.67 -10.56,16.27 -20.18,14.75 -9.62,-1.52 -16.18,-10.62 -14.66,-20.29l34.84 5.54zm-3744.32 -20.51l3726.9 0 0 35.48 -3726.9 0 -17.49 -15.42 17.49 -20.06zm0 35.48c-9.74,0 -17.64,-7.95 -17.64,-17.74 0,-9.79 7.9,-17.74 17.64,-17.74l0 35.48zm-102.04 -931.87l119.53 911.81 -34.98 4.64 -119.53 -911.81 17.04 -20.05 17.94 15.41zm-34.98 4.64c-1.27,-9.71 5.53,-18.63 15.18,-19.91 9.65,-1.28 18.53,5.56 19.8,15.27l-34.98 4.64z"/>
+    <polygon id="1" class="fil1" points="-1.43,1822.52 4004.79,1719.93 3845,2734.33 118.1,2734.33 "/>
+   </g>
+   <polygon class="fil2 str0" points="484.76,714.43 3396.9,460.43 3699.46,1954.32 257.84,2208.32 "/>
+   <g>
+    <line class="fil3 str1" x1="3387.44" y1="487.51" x2="3964.2" y2= "103" />
+   </g>
+   <circle class="fil2 str0" cx="3964.2" cy="103" r="92.75"/>
+   <polygon class="fil1 str0" points="688.3,816.43 3166.62,600.27 3424.11,1871.62 495.19,2087.78 "/>
+   <rect class="fil2 str0" transform="matrix(0.994282 0.10679 -0.10679 0.994282 585.545 1101.31)" width="1146.16" height="43.52"/>
+   <polygon class="fil2 str0" points="1584.54,1204.38 1752.22,1222.38 1632.74,1570.66 "/>
+   <rect class="fil2 str0" transform="matrix(0.998265 -0.0588798 0.0588798 0.998265 2072.65 1197.73)" width="1206.92" height="43.52"/>
+   <polygon class="fil2 str0" points="2205.28,1187.06 2036.93,1196.99 2139.53,1550.6 "/>
+   <rect class="fil2 str0" transform="matrix(0.998329 -0.0577851 0.0577851 0.998329 1639.47 1908.31)" width="631.04" height="179.52"/>
+   <polyline class="fil3 str2" points="802.06,2210.93 1346.06,2285.41 1346.06,2524.77 600.78,2406.77 "/>
+   <polyline class="fil3 str2" points="3230.75,2141.58 2686.75,2216.06 2686.75,2455.42 3432.03,2337.42 "/>
+   <polygon class="fil1 str2" points="456.07,2734.33 1923.04,2734.33 1867.43,3014.97 401.23,3248.33 "/>
+   <polygon class="fil1 str2" points="3671.04,2735.41 2204.07,2735.41 2259.68,3016.05 3725.88,3249.41 "/>
+   <polygon class="fil2 str0" points="428.65,2991.33 952.38,3160.6 401.23,3248.33 "/>
+   <polygon class="fil2 str0" points="3698.46,2992.41 3174.73,3161.68 3725.88,3249.41 "/>
+   <rect class="fil2 str0" x="101.14" y="2604.95" width="3743.85" height="129.37"/>
+  </g>
+ </g>
+</svg>
