@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW 2017 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="23.5478mm" height="23.5478mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 2354.78 2354.78"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil6 {fill:none;fill-rule:nonzero}
+    .fil1 {fill:#1C8797}
+    .fil3 {fill:#1C8797}
+    .fil0 {fill:#ECE2E1}
+    .fil4 {fill:black;fill-rule:nonzero}
+    .fil2 {fill:url(#id1)}
+    .fil5 {fill:url(#id2)}
+   ]]>
+  </style>
+   <clipPath id="id0" style="clip-rule:nonzero">
+    <path d="M1180.86 1081.03l228.38 -324.13 151.34 0 -307.22 415.96 318.7 425.03 -148.63 0 -246.19 -336.52 -3.32 0 -242.57 336.52 -148.63 0 318.4 -428.35 -306.92 -412.64 151.34 0 231.7 324.13 3.62 0z"/>
+   </clipPath>
+  <linearGradient id="id1" gradientUnits="userSpaceOnUse" x1="1029.88" y1="378.23" x2="1078.84" y2="2140.64">
+   <stop offset="0" style="stop-opacity:1; stop-color:#A2DB96"/>
+   <stop offset="0.360784" style="stop-opacity:1; stop-color:#77D69C"/>
+   <stop offset="0.658824" style="stop-opacity:1; stop-color:#24CCA9"/>
+   <stop offset="1" style="stop-opacity:1; stop-color:#4AB483"/>
+  </linearGradient>
+  <linearGradient id="id2" gradientUnits="userSpaceOnUse" xlink:href="#id1" x1="1002.12" y1="227.79" x2="1060.29" y2="2321.96">
+  </linearGradient>
+ </defs>
+ <g id="Capa_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1177.39" cy="1177.39" r="1177.4"/>
+  <circle class="fil1" cx="1177.39" cy="1177.39" r="1098.03"/>
+  <circle class="fil2" cx="1177.39" cy="1177.39" r="899.58"/>
+  <circle class="fil3" cx="1177.39" cy="1177.39" r="819.76"/>
+  <polygon class="fil4" points="1180.86,1081.03 1409.24,756.9 1560.58,756.9 1253.36,1172.86 1572.06,1597.89 1423.43,1597.89 1177.24,1261.37 1173.92,1261.37 931.35,1597.89 782.72,1597.89 1101.12,1169.54 794.2,756.9 945.54,756.9 1177.24,1081.03 "/>
+  <g style="clip-path:url(#id0)">
+   <g id="_1821652178048">
+    <circle class="fil5" cx="1177.39" cy="1177.39" r="1068.9"/>
+   </g>
+  </g>
+  <polygon class="fil6" points="1180.86,1081.03 1409.24,756.9 1560.58,756.9 1253.36,1172.86 1572.06,1597.89 1423.43,1597.89 1177.24,1261.37 1173.92,1261.37 931.35,1597.89 782.72,1597.89 1101.12,1169.54 794.2,756.9 945.54,756.9 1177.24,1081.03 "/>
+ </g>
+</svg>

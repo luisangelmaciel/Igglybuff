@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+
+<html dir="ltr" lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
+<meta name="google" value="notranslate">
+
+<script>
+function addRow(name, url, isdir) {
+  if (name == "." || name == "..")
+    return;
+
+  var root = document.location.pathname;
+  if (root.substr(-1) !== "/")
+    root += "/";
+
+  var tbody = document.getElementById("tbody");
+  var row = document.createElement("tr");
+  var file_cell = document.createElement("td");
+  var link = document.createElement("a");
+
+  link.className = isdir ? "icon dir" : "icon file";
+
+  if (isdir) {
+    name = name + "/";
+    url = url + "/";
+  } else {
+    link.draggable = "true";
+    link.addEventListener("dragstart", onDragStart, false);
+  }
+  link.innerText = name;
+  link.href = root + url;
+
+  file_cell.dataset.value = name;
+  file_cell.appendChild(link);
+
+  row.appendChild(file_cell);
+
+  tbody.appendChild(row);
+}
+
+function onDragStart(e) {
+  var el = e.srcElement;
+  var name = el.innerText.replace(":", "");
+  var download_url_data = "application/octet-stream:" + name + ":" + el.href;
+  e.dataTransfer.setData("DownloadURL", download_url_data);
+  e.dataTransfer.effectAllowed = "copy";
+}
+
+function createCell(value, text) {
+  var cell = document.createElement("td");
+  cell.setAttribute("class", "detailsColumn");
+  cell.dataset.value = value;
+  cell.innerText = text;
+  return cell;
+}
+
+function start(location) {
+  var header = document.getElementById("header");
+  header.innerText = header.innerText.replace("LOCATION", location);
+
+  document.getElementById("title").innerText = header.innerText;
+}
+
+function onHasParentDirectory() {
+  var box = document.getElementById("parentDirLinkBox");
+  box.style.display = "block";
+
+  var root = document.location.pathname;
+  if (!root.endsWith("/"))
+    root += "/";
+
+  var link = document.getElementById("parentDirLink");
+  link.href = root + "..";
+}
+
+function sortTable(column) {
+  var theader = document.getElementById("theader");
+  var oldOrder = theader.cells[column].dataset.order || '1';
+  oldOrder = parseInt(oldOrder, 10)
+  var newOrder = 0 - oldOrder;
+  theader.cells[column].dataset.order = newOrder;
+
+  var tbody = document.getElementById("tbody");
+  var rows = tbody.rows;
+  var list = [], i;
+  for (i = 0; i < rows.length; i++) {
+    list.push(rows[i]);
+  }
+
+  list.sort(function(row1, row2) {
+    var a = row1.cells[column].dataset.value;
+    var b = row2.cells[column].dataset.value;
+    if (column) {
+      a = parseInt(a, 10);
+      b = parseInt(b, 10);
+      return a > b ? newOrder : a < b ? oldOrder : 0;
+    }
+
+    // Column 0 is text.
+    if (a > b)
+      return newOrder;
+    if (a < b)
+      return oldOrder;
+    return 0;
+  });
+
+  // Appending an existing child again just moves it.
+  for (i = 0; i < list.length; i++) {
+    tbody.appendChild(list[i]);
+  }
+}
+
+// Add event handlers to column headers.
+function addHandlers(element, column) {
+  element.onclick = (e) => sortTable(column);
+  element.onkeydown = (e) => {
+    if (e.key == 'Enter' || e.key == ' ') {
+      sortTable(column);
+      e.preventDefault();
+    }
+  };
+}
+
+function onLoad() {
+  addHandlers(document.getElementById('nameColumnHeader'), 0);
+}
+
+window.addEventListener('DOMContentLoaded', onLoad);
+</script>
+
+<style>
+
+  h1 {
+    border-bottom: 1px solid #c0c0c0;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    white-space: nowrap;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  th {
+    cursor: pointer;
+  }
+
+  .searchable-item, td.detailsColumn {
+ 
+   
+    white-space: nowrap;
+  }
+
+  a, a.icon {
+    padding-inline-start: 1.5em;
+    text-decoration: none;
+    user-select: auto;
+  }
+
+  a.icon:hover {
+    text-decoration: underline;
+  }
+  .ico-image, .file {
+    display:list-item; margin-right:10px; background : url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4wLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL1RSLzIwMDEvUkVDLVNWRy0yMDAxMDkwNC9EVEQvc3ZnMTAuZHRkIj4NCjwhLS0gQ3JlYXRvcjogQ29yZWxEUkFXIDIwMTcgLS0+DQo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgd2lkdGg9IjQuMjMzMm1tIiBoZWlnaHQ9IjQuMjMzMm1tIiB2ZXJzaW9uPSIxLjAiIHN0eWxlPSJzaGFwZS1yZW5kZXJpbmc6Z2VvbWV0cmljUHJlY2lzaW9uOyB0ZXh0LXJlbmRlcmluZzpnZW9tZXRyaWNQcmVjaXNpb247IGltYWdlLXJlbmRlcmluZzpvcHRpbWl6ZVF1YWxpdHk7IGZpbGwtcnVsZTpldmVub2RkOyBjbGlwLXJ1bGU6ZXZlbm9kZCINCnZpZXdCb3g9IjAgMCA0MjMuMzIgNDIzLjMyIg0KIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiA8ZGVmcz4NCiAgPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCiAgIDwhW0NEQVRBWw0KICAgIC5maWwwIHtmaWxsOiNCM0IzQjN9DQogICAgLmZpbDEge2ZpbGw6I0IzQjNCM30NCiAgICAuZmlsMiB7ZmlsbDojRkRGREZEfQ0KICAgXV0+DQogIDwvc3R5bGU+DQogPC9kZWZzPg0KIDxnIGlkPSJDYXBhX3gwMDIwXzEiPg0KICA8bWV0YWRhdGEgaWQ9IkNvcmVsQ29ycElEXzBDb3JlbC1MYXllciIvPg0KICA8cGF0aCBjbGFzcz0iZmlsMCIgZD0iTTM4Mi41OSA2OC40bC0yLjE3IDI1OC4zYy0yNS45NSwtMjcuMjQgLTMyLjk1LC02MS4xMiAtNzAuODcsLTg1LjIgLTMwLjAyLDE4Ljg0IC01MC43LDUxLjMgLTc1LjM2LDcyLjc4IC0xOC4wOCwtMTQuMzMgLTQzLjM2LC01Ni42IC01NS44NCwtNzYuODkgLTE2LjE0LC0yNi4yNiAtMjcuMDQsLTUyLjQzIC01NS4xOCwtNzMuNTIgLTI5LjcxLDMzLjU5IC01OS4xMywxMDguODcgLTc1LjEzLDE2MS45MyAtOC43NSwtMjUuMjcgLTExLjcyLC0yMTguNDcgLTUuNjQsLTI1My4wNGwzNDAuMTkgLTQuMzZ6bS0zNjUuODkgLTIxLjgxYy02LjM0LDM2LjAzIC0zLjQ4LDMwNS4yMSA0LjUzLDMzMy40MiAzNi42Niw2LjU0IDM1NC42MiwzLjkgMzgzLjExLC00LjQgNi43NiwtMzAuMjIgNy44LC0yOTYuMzUgMS43OCwtMzI5LjYxIC00MS44MSwtMTQuNzcgLTMyMy41OCwwLjg1IC0zODkuNDIsMC41OXoiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDEiIGQ9Ik0yMzYuNCAxMzguOTZjLTE0LjY3LDU5LjIxIDYuNDksNzEuNDcgNTUuNjgsNjUuMjkgMjAuODEsLTM3LjE3IDIyLjAzLC0yOS43IDYuMDMsLTcyLjk3IC0yOCwtNy41NCAtNDMuMjUsLTcuMSAtNjEuNzEsNy42OHoiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDIiIGQ9Ik0yMzYuNCAxMzguOTZjMTguNDYsLTE0Ljc4IDMzLjcxLC0xNS4yMiA2MS43MSwtNy42OCAxNiw0My4yNyAxNC43OCwzNS44IC02LjAzLDcyLjk3IC00OS4xOSw2LjE4IC03MC4zNSwtNi4wOCAtNTUuNjgsLTY1LjI5em0tMTk0IC02Ni4yYy02LjA4LDM0LjU3IC0zLjExLDIyNy43NyA1LjY0LDI1My4wNCAxNiwtNTMuMDYgNDUuNDIsLTEyOC4zNCA3NS4xMywtMTYxLjkzIDI4LjE0LDIxLjA5IDM5LjA0LDQ3LjI2IDU1LjE4LDczLjUyIDEyLjQ4LDIwLjI5IDM3Ljc2LDYyLjU2IDU1Ljg0LDc2Ljg5IDI0LjY2LC0yMS40OCA0NS4zNCwtNTMuOTQgNzUuMzYsLTcyLjc4IDM3LjkyLDI0LjA4IDQ0LjkyLDU3Ljk2IDcwLjg3LDg1LjJsMi4xNyAtMjU4LjMgLTM0MC4xOSA0LjM2eiIvPg0KIDwvZz4NCjwvc3ZnPg0K") left top no-repeat;
+  }
+
+  .ico-image,  a.dir {
+    background : url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4wLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL1RSLzIwMDEvUkVDLVNWRy0yMDAxMDkwNC9EVEQvc3ZnMTAuZHRkIj4NCjwhLS0gQ3JlYXRvcjogQ29yZWxEUkFXIDIwMTcgLS0+DQo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgd2lkdGg9IjQuMjMzMm1tIiBoZWlnaHQ9IjQuMjMzMm1tIiB2ZXJzaW9uPSIxLjAiIHN0eWxlPSJzaGFwZS1yZW5kZXJpbmc6Z2VvbWV0cmljUHJlY2lzaW9uOyB0ZXh0LXJlbmRlcmluZzpnZW9tZXRyaWNQcmVjaXNpb247IGltYWdlLXJlbmRlcmluZzpvcHRpbWl6ZVF1YWxpdHk7IGZpbGwtcnVsZTpldmVub2RkOyBjbGlwLXJ1bGU6ZXZlbm9kZCINCnZpZXdCb3g9IjAgMCA0MjMuMzIgNDIzLjMyIg0KIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiA8ZGVmcz4NCiAgPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCiAgIDwhW0NEQVRBWw0KICAgIC5maWwwIHtmaWxsOiNCM0IzQjN9DQogICAgLmZpbDEge2ZpbGw6I0IzQjNCM30NCiAgICAuZmlsMiB7ZmlsbDojRkRGREZEfQ0KICAgXV0+DQogIDwvc3R5bGU+DQogPC9kZWZzPg0KIDxnIGlkPSJDYXBhX3gwMDIwXzEiPg0KICA8bWV0YWRhdGEgaWQ9IkNvcmVsQ29ycElEXzBDb3JlbC1MYXllciIvPg0KICA8cGF0aCBjbGFzcz0iZmlsMCIgZD0iTTM4Mi41OSA2OC40bC0yLjE3IDI1OC4zYy0yNS45NSwtMjcuMjQgLTMyLjk1LC02MS4xMiAtNzAuODcsLTg1LjIgLTMwLjAyLDE4Ljg0IC01MC43LDUxLjMgLTc1LjM2LDcyLjc4IC0xOC4wOCwtMTQuMzMgLTQzLjM2LC01Ni42IC01NS44NCwtNzYuODkgLTE2LjE0LC0yNi4yNiAtMjcuMDQsLTUyLjQzIC01NS4xOCwtNzMuNTIgLTI5LjcxLDMzLjU5IC01OS4xMywxMDguODcgLTc1LjEzLDE2MS45MyAtOC43NSwtMjUuMjcgLTExLjcyLC0yMTguNDcgLTUuNjQsLTI1My4wNGwzNDAuMTkgLTQuMzZ6bS0zNjUuODkgLTIxLjgxYy02LjM0LDM2LjAzIC0zLjQ4LDMwNS4yMSA0LjUzLDMzMy40MiAzNi42Niw2LjU0IDM1NC42MiwzLjkgMzgzLjExLC00LjQgNi43NiwtMzAuMjIgNy44LC0yOTYuMzUgMS43OCwtMzI5LjYxIC00MS44MSwtMTQuNzcgLTMyMy41OCwwLjg1IC0zODkuNDIsMC41OXoiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDEiIGQ9Ik0yMzYuNCAxMzguOTZjLTE0LjY3LDU5LjIxIDYuNDksNzEuNDcgNTUuNjgsNjUuMjkgMjAuODEsLTM3LjE3IDIyLjAzLC0yOS43IDYuMDMsLTcyLjk3IC0yOCwtNy41NCAtNDMuMjUsLTcuMSAtNjEuNzEsNy42OHoiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDIiIGQ9Ik0yMzYuNCAxMzguOTZjMTguNDYsLTE0Ljc4IDMzLjcxLC0xNS4yMiA2MS43MSwtNy42OCAxNiw0My4yNyAxNC43OCwzNS44IC02LjAzLDcyLjk3IC00OS4xOSw2LjE4IC03MC4zNSwtNi4wOCAtNTUuNjgsLTY1LjI5em0tMTk0IC02Ni4yYy02LjA4LDM0LjU3IC0zLjExLDIyNy43NyA1LjY0LDI1My4wNCAxNiwtNTMuMDYgNDUuNDIsLTEyOC4zNCA3NS4xMywtMTYxLjkzIDI4LjE0LDIxLjA5IDM5LjA0LDQ3LjI2IDU1LjE4LDczLjUyIDEyLjQ4LDIwLjI5IDM3Ljc2LDYyLjU2IDU1Ljg0LDc2Ljg5IDI0LjY2LC0yMS40OCA0NS4zNCwtNTMuOTQgNzUuMzYsLTcyLjc4IDM3LjkyLDI0LjA4IDQ0LjkyLDU3Ljk2IDcwLjg3LDg1LjJsMi4xNyAtMjU4LjMgLTM0MC4xOSA0LjM2eiIvPg0KIDwvZz4NCjwvc3ZnPg0K") left top no-repeat;
+  }
+  .ico-image,  a.image {
+    background : url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABt0lEQVR42oxStZoWQRCs2cXdHTLcHZ6EjAwnQWIkJyQlRt4Cd3d3d1n5d7q7ju1zv/q+mh6taQsk8fn29kPDRo87SDMQcNAUJgIQkBjdAoRKdXjm2mOH0AqS+PlkP8sfp0h93iu/PDji9s2FzSSJVg5ykZqWgfGRr9rAAAQiDFoB1OfyESZEB7iAI0lHwLREQBcQQKqo8p+gNUCguwCNAAUQAcFOb0NNGjT+BbUC2YsHZpWLhC6/m0chqIoM1LKbQIIBwlTQE1xAo9QDGDPYf6rkTpPc92gCUYVJAZjhyZltJ95f3zuvLYRGWWCUNkDL2333McBh4kaLlxg+aTmyL7c2xTjkN4Bt7oE3DBP/3SRz65R/bkmBRPGzcRNHYuzMjaj+fdnaFoJUEdTSXfaHbe7XNnMPyqryPcmfY+zURaAB7SHk9cXSH4fQ5rojgCAVIuqCNWgRhLYLhJB4k3iZfIPtnQiCpjAzeBIRXMA6emAqoEbQSoDdGxFUrxS1AYcpaNbBgyQBGJEOnYOeENKR/iAd1npusI4C75/c3539+nbUjOgZV5CkAU27df40lH+agUdIuA/EAgDmZnwZlhDc0wAAAABJRU5ErkJggg==") left top no-repeat;
+  }
+
+  .ico-image, a.up {
+    background : url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4wLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL1RSLzIwMDEvUkVDLVNWRy0yMDAxMDkwNC9EVEQvc3ZnMTAuZHRkIj4NCjwhLS0gQ3JlYXRvcjogQ29yZWxEUkFXIDIwMTcgLS0+DQo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgd2lkdGg9IjQuMjMzMm1tIiBoZWlnaHQ9IjQuMjMzMm1tIiB2ZXJzaW9uPSIxLjAiIHN0eWxlPSJzaGFwZS1yZW5kZXJpbmc6Z2VvbWV0cmljUHJlY2lzaW9uOyB0ZXh0LXJlbmRlcmluZzpnZW9tZXRyaWNQcmVjaXNpb247IGltYWdlLXJlbmRlcmluZzpvcHRpbWl6ZVF1YWxpdHk7IGZpbGwtcnVsZTpldmVub2RkOyBjbGlwLXJ1bGU6ZXZlbm9kZCINCnZpZXdCb3g9IjAgMCA0MjMuMzIgNDIzLjMyIg0KIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiA8ZGVmcz4NCiAgPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCiAgIDwhW0NEQVRBWw0KICAgIC5maWwwIHtmaWxsOiNCM0IzQjN9DQogICAgLmZpbDEge2ZpbGw6I0IzQjNCM30NCiAgICAuZmlsMiB7ZmlsbDojRkRGREZEfQ0KICAgXV0+DQogIDwvc3R5bGU+DQogPC9kZWZzPg0KIDxnIGlkPSJDYXBhX3gwMDIwXzEiPg0KICA8bWV0YWRhdGEgaWQ9IkNvcmVsQ29ycElEXzBDb3JlbC1MYXllciIvPg0KICA8cGF0aCBjbGFzcz0iZmlsMCIgZD0iTTM4Mi41OSA2OC40bC0yLjE3IDI1OC4zYy0yNS45NSwtMjcuMjQgLTMyLjk1LC02MS4xMiAtNzAuODcsLTg1LjIgLTMwLjAyLDE4Ljg0IC01MC43LDUxLjMgLTc1LjM2LDcyLjc4IC0xOC4wOCwtMTQuMzMgLTQzLjM2LC01Ni42IC01NS44NCwtNzYuODkgLTE2LjE0LC0yNi4yNiAtMjcuMDQsLTUyLjQzIC01NS4xOCwtNzMuNTIgLTI5LjcxLDMzLjU5IC01OS4xMywxMDguODcgLTc1LjEzLDE2MS45MyAtOC43NSwtMjUuMjcgLTExLjcyLC0yMTguNDcgLTUuNjQsLTI1My4wNGwzNDAuMTkgLTQuMzZ6bS0zNjUuODkgLTIxLjgxYy02LjM0LDM2LjAzIC0zLjQ4LDMwNS4yMSA0LjUzLDMzMy40MiAzNi42Niw2LjU0IDM1NC42MiwzLjkgMzgzLjExLC00LjQgNi43NiwtMzAuMjIgNy44LC0yOTYuMzUgMS43OCwtMzI5LjYxIC00MS44MSwtMTQuNzcgLTMyMy41OCwwLjg1IC0zODkuNDIsMC41OXoiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDEiIGQ9Ik0yMzYuNCAxMzguOTZjLTE0LjY3LDU5LjIxIDYuNDksNzEuNDcgNTUuNjgsNjUuMjkgMjAuODEsLTM3LjE3IDIyLjAzLC0yOS43IDYuMDMsLTcyLjk3IC0yOCwtNy41NCAtNDMuMjUsLTcuMSAtNjEuNzEsNy42OHoiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDIiIGQ9Ik0yMzYuNCAxMzguOTZjMTguNDYsLTE0Ljc4IDMzLjcxLC0xNS4yMiA2MS43MSwtNy42OCAxNiw0My4yNyAxNC43OCwzNS44IC02LjAzLDcyLjk3IC00OS4xOSw2LjE4IC03MC4zNSwtNi4wOCAtNTUuNjgsLTY1LjI5em0tMTk0IC02Ni4yYy02LjA4LDM0LjU3IC0zLjExLDIyNy43NyA1LjY0LDI1My4wNCAxNiwtNTMuMDYgNDUuNDIsLTEyOC4zNCA3NS4xMywtMTYxLjkzIDI4LjE0LDIxLjA5IDM5LjA0LDQ3LjI2IDU1LjE4LDczLjUyIDEyLjQ4LDIwLjI5IDM3Ljc2LDYyLjU2IDU1Ljg0LDc2Ljg5IDI0LjY2LC0yMS40OCA0NS4zNCwtNTMuOTQgNzUuMzYsLTcyLjc4IDM3LjkyLDI0LjA4IDQ0LjkyLDU3Ljk2IDcwLjg3LDg1LjJsMi4xNyAtMjU4LjMgLTM0MC4xOSA0LjM2eiIvPg0KIDwvZz4NCjwvc3ZnPg0K") left top no-repeat;
+  }
+
+  html[dir=rtl] a {
+    background-position-x: right;
+  }
+
+  #parentDirLinkBox {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+  
+</style>
+
+<title id="title"></title>
+
+</head>
+
+<body>
+
+<h1 id="header">Bookmarks</h1>
+
+<main class="searchable w3-center" id="publicaciones">
+ 
+  <input type="text"  style="display: inline-flexbox;outline: none; width: 93%; 
+  height: 25px; border-radius: 10px; padding: 15px;" w3-margin-left:5px;
+  placeholder="🔍 Buscar..."/><style>input {border: 1px; font-weight: bolder; font-size: 14px; 
+       background: #1cadf613;}</style>
+      <div class="searchable-item" >  
+        <a href="" target="_blank" class="searchable-item ico-image"> address-book</a>
+        <a href="" target="_blank" class="searchable-item ico-image"> address-card</a>
+        <a href="" target="_blank" class="searchable-item ico-image"> address-adjust</a>
+        <a href="" target="_blank" class="searchable-item ico-image"> address-air-freshener</a>
+        <a href="" target="_blank" class="searchable-item ico-image"> align-center</a>
+     
+        <H1>Bookmarks</H1>
+<DL><p>
+    <DT><H3 class="searchable-item" ADD_DATE="1692166260" LAST_MODIFIED="1696926086" PERSONAL_TOOLBAR_FOLDER="true" class="searchable-item">Bookmarks bar</H3>
+    <DL><p>
+        <DT><H3 class="searchable-item" ADD_DATE="1696925946" LAST_MODIFIED="0" class="searchable-item">09-10-2023</H3>
+        <DL><p>
+            <DT><A HREF="https://tantek.com//offline.html" ADD_DATE="1696884699"class="searchable-item"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADaklEQVQ4jV2TW2hbdQCHv/85uZw0aWuaprf0trSrDXWjqzgm7FK30bGVKgzEB1EUyxDnk+KkMKTbQNAJDpE9qBRxKm6wTQQn0nqpytQxSi+z682mNaWpvZiYpDk5l+Tv02T09/R7+L7HD7YsljF2fPL3+sWjb/RPt9RU5ntOnrRfno5OXr96+b3FeLxtK++4d6SU7oux9QuvzEdPCCxlfnaOtGEydfs29vzdyLzTFxnp6X5pILb8/vO11aeEECb3y69Nxb47Ojotj/38m4wcOSzLggHpKymVmtcnffV1svnEi1KrrJJdNwblW9Ho11JKJ4AC8O7M0jujqdTBiJVm6cxpNsbv4HQ6EQrYlokWCPDPzV9waBoiazBu2seurC6fAxAL6XTk6VtTE0FPTp3v68Mu1vA0NjD72TUs08SwLLo+vYy/NkTBKcgLB0VeD25Vt96ua92ufL+28oJl6ury0DBZr4+WvlM429oRAhAC1a2RkIJ4Mk1WT2PmNtEzaXJ61vl7au1Zx3gy/pgoGKSmJtB2tZPJ5cmlcwhFQVEVCrqBz1rBsMC23FRU2GiqQTC/SlHG6nRMxjbqHIqLchXUtjAhfwGXiDNrWliWDUiWfrxFzRPddAR9CK8kkUly56sRVrxWq8NDQSZ1ndDBQySKfGQyWdbjWey8jW3bSCmZ+fgSlp2j4pnjOJJ5NGeBEtcGprsS5cFS10JP2GB7u4egL8/aSgZPRSm2ZeMOlvHAwzsAiF66wq8ffEG734+RM6FpGx0tdTNKd33V4GYyQzBvsLtaJ+w3qGlvwOH1UL7vEep7n6P1zOsUR5qJXf2Sn8YmSKayBIvzPNrYNKTsrG7+sMpjG1IxkAWDgEenuJBHURUqtpWjCgstWEbtU48jJawvLFDI6nhVb/ah6r0DDr/Hv/jD3PD5ob9unv5jeJqxb8aIT0cpaSynbmctGWGTSIPm9yEUgb2ZoS1YSldrR7/X640rAJ1N+/sXP//z+rcXriFcOof7utl/thetxEnIk8EpTbQiB1pZCXIjQXdj00d7Q7vO/x+TECIvpXxyz5F9ZxeDC6+qrpxbLRUUdEHODFOXmkJ6XaxGao3j4T1vHmg6cO5eR2Jrngk90TCaGOkdnrx76F99tcnnqpAuoc2FA6HBzsbdA6FAIHY//x8/VYSC+9GFFgAAAABJRU5ErkJggg=="> &nbsp; Ejemplo de como utilizar -Offline- usando &lt;link rel=&quot;serviceworker&quot; href=&quot;serviceworker.js&quot;&gt;</A>
+            <DT><A HREF="https://aperture.p3k.io/" ADD_DATE="1696884981"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACkUlEQVQ4jW2TS2icdRTFf+f/fU5SymDQdlJaFZFCYKItPvAFBXFTMZhdjI+VQhE3CtKN4gOEiAqC4K4uiqWbaBEUQYoLS6VLaRWjBApqQyy2SS2EmWS+b/73uJhJWrFnc+FyzuWe+xDXY2amoNPZWbhxL/hd4HbANsugI1HUX9DprHHqVH9TUmyJp6ebaSNeldIH2H9LGgUeBJoSuyXWCmuCcuQRtyfOsrhYXSswPd0san0oOCy0W9J+m3mJK8AkIOBnrFFJh1Mw5vbEaRYXqwQobegV7EPYJTbYLeE3bJ/D/nyYA2IQzaHU42VAJVNTY9S5xBzFCrAGnuSEtyc8lwGMB40EQCmY4bEnj5U3darnbPYhBSBJEcTx/P13X2/N5+DB14qcHiLiqWH1i0ocl31P6ZxfAO4fUiNIn+WGz/xnOydPXszwVXHg8SlgRdIc/TgAmi2pqz1DWjY6VuT4KP9wZpX/w6rqv5SYw37UaBa8nFJdo7oO5f5R1RsL9PuzNxADkPr9E/Sqh6nrZ1VXUNeUrqs/kL7FsSDrHcP8DdXt9i731t9EenozJbFUpB2t34u6KpXjdSLfknI+V+xsNUab41fqq5c6wxug0Wo9ofCkIhYU8YsifiP7S23bu/e2TPoGs58B+4hhDLtG8T6kZ2TvMkjgwUZJwFLVrz4u18+fX27cedc89iRQIsAk4HkMUpwFXgJ2+JqhDLzNhQtXC4Bctn4qU+9WRX6AiB8VsU0RbTnuduRLMvOKfJ8itiuir/Cn1froHN3V3uAXuqtVHmmcLpK6KejiGCfcJiyF9yniHxwnwOPOfFLVvfdYWVpjc0DXoeTmO5ojIxuzsl602DP0/GcSb6Wcf+2urFwGtt75XwVpTpPSyZYAAAAAAElFTkSuQmCC">&lt;b&gt;Aperture.p3k.io&lt;/b&gt; es sólo una opción para iniciarse en este ecosistema. Puede encontrar una lista de otros servidores Microsub en indieweb.org , muchos de los cuales pueden ser autohospedados.</A>
+            <DT><A HREF="https://transfonter.org/" ADD_DATE="1696889041"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABOElEQVQ4jaWTv0tCYRSGn/dyjQYHhwaHhoaGFkGosaGxIRqj0akxpBJEokFCBM3ClpD+DGlqDJpMyYYGh/6ABpGmvNzTcG9SdFPUs72c73vO+34/ZGZijnImLVC5m5gZoMvHRWKfz6o8bc7mwF8ogJZxrK5Gy50KoOrzCugkVGkGykznQF4JWAQeAk0x6jwiAWHmfaDPMLYLNIEk7rAwEaBGy8Wxejj11PKpPr5zBHiIrCqd1fEOBsqA0sArcWsAWC7dw7gCXBy/9i9A5W4CUQyUf2gH696o6cVKwDuwo4v2drSDIGMSaNrxxv3PluVTfWRnoap9X+sIoEpnFZEFvDDz34pzC7wAa3zo4LeDIJsLqlou3YvaH0TyA7hxruv2ksxMQSa7i5w6tuwmfJ62B7xND9CW5v3OX7JIZoWCVqUMAAAAAElFTkSuQmCC">✰✰✰✰✰ Generador @font-face Fuentes en formato TTF, OTF, WOFF, WOFF2 o SVG a estilos CSS con url Base64. </A>
+            <DT><A HREF="https://www.daltonmaag.com/portfolio/font-library/darkmode.html" ADD_DATE="1696889997"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABCElEQVQ4jcXRvUoDURCG4Wd1EXcLCYjgDwQRQUQDYmMj2KURC2/B3juz08rOG9BGm1Qa8AcECYKJIIjFjrJskkWwcOCw58x85zvvzPLfMVlTa+II07gdJ5qoMdjGJnbrCMYZrGEGL+gGTT5KmFTOOdo4wGmYvAYJnKGBRyygV53BBvYxQIpVbOEeH2F4h8Mgm68aTGEn9p+KAT6hE2fI8I4rZEm80IhiL77LuMRK4GahuYn6G/rIUxxXKC6wF7izir9wXXq9W9L2U8WkHyKxiFbsW6W8MByKBHOVXBZrUGphPQxOAv0nUjyPcg7jpqL382/kqigdcxmWSuhDF39j0FG0MajR/D2+AHESLcm/ujXtAAAAAElFTkSuQmCC">¡¡ Font library Darkmode, ideal para el Darkmode!!&lt;span lang=&quot;es&quot; class=&quot;sr-only&quot;&gt;Biblioteca de fuentes: Modo oscuro&lt;span&gt;El efecto de ilusión de irradiación, asegura coherencia independientemente del contraste entre el texto y el fondo.</A>
+            <DT><A HREF="https://codepen.io/hellogreg/live/xxVMmNW/1811c97a14a3a05788d91aea4bdefd95" ADD_DATE="1696890193"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACTElEQVQ4jY2TMW/iQBCF36yNlDQkSnGUaJsUSFGCDBWhgdoNPVT8DeTkf9DwExA/ggonSFSuQIqE7honHdKu510RGyXKFbfdm52dHT29DyRHJN9IFiQ9SaqqOudYHeccVVVL6cveN5IjIfkbwC8ACkCKokAQBAAgLy8vAIB2uw0A/HJHAAbAH5RTC1VV772WGzBJEgZBwCAImCQJqwW891puU5CklI9FRCAistlsMJ1O+fHxIRcXFwCA0+mEq6srzudziaKo+hTGGBpVNcYYcc7JbDZDp9Nhs9mUNE3R7XbR7XaRpimazaZ0Oh3OZjN478UYI6pqoKq63++11+uptVZXq9XZvMFgwMFgcNar1YrWWn18fNT9fq+qqiDJxWJBAGy1WsyyjMfjkXEcs16vs16vM45jHo9HZlnGVqtFAFwsFiTJkCScc7i9vUWv18Pd3R2ur69hrcVmswEAjMdjPDw84P39HZPJBN57OOdAEiEAiAgAQFVRmnnW1anqVa3qMSKCWq2GLMuwXq+x2+2w3W7RaDQQRRGiKEKj0cB2u8Vut8N6vUaWZajVap9DVFUPh4P2+3211upyuTybNhwOORwOz3q5XNJaq/1+Xw+Hw6eJRVGc45okCUVE4zhmnuccj8ecTCbM85xxHNMYo0mSsIp5URQ/g5SmKabTKfM8l8vLS5DE6XTCzc0N5/O5tNvtb0E6R5mkOucqYPj09MQwDBmGIZ+fn7+CpSS/RfkHTMYYiIi8vr5CRHB/f4+SkX/C9BXn4j9wrvreSI7+AvzfT4EQnpIjAAAAAElFTkSuQmCC">4 reglas para hacer una fuente tipografica perfecta para Darkmode. Adjusting fonts for dark mode: full demo Live Preview</A>
+            <DT><A HREF="https://creativecommons.org/publicdomain/zero/1.0/" ADD_DATE="1696897866"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABaElEQVQ4jZXTPUvVYRgG8N85HXtdRLI+RC0mVIOugjS0OAiOTX2AwiWkwAJFK3AoFMUli3CQmiL6CkFrm4NBWgQFpUGn4bn++vd4CLrhhue5ruvmfu6Xh6N2FSv4gnZ8B8sY6KLftx48ScAuNjAT38BeuAdo1QObaOBlBI9wvkuCc3gYzaskbFbkvRDjHS9qxXtq+PVo5yvgQoDpf9XXYXcScwWe4hvOhLyEWdxEX7AJzOFaXnNCafIz+IQXEV7Gd3zAx9Q8mWzvEjQS7XNsC3k34GP8zPkkevEVC8H6g8MU2vtdjP2unfdwKlg1tmM4nfOfSrhVK2EQP1LCe2UHbueVb7GJ0WhXlQWz6HATBxN4o5Z5QhnbUO7H8RlrcNH/j/FWYoYr4H6AsZqo1eGN4CPRrlTCZnw9xBTOdsna52Ckb5QGN+qCZspoK51/rSzUjLL7v8LNOrzaR2wAS8qSVN95O1j9OzfgL3/FWq/l/uhmAAAAAElFTkSuQmCC">Con &lt;b&gt;CC0 1.0 Deed | CC0 1.0 Universal &lt;/b&gt; de Creative Commons Puedes copiar, modificar, distribuir y realizar la obra, incluso con fines comerciales, todo sin pedir permiso</A>
+            <DT><A HREF="https://www.prideflags.org/privacy/" ADD_DATE="1696899425"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAACs0lEQVQ4jV2SSUiUYRiA32/5/39m/lk1acxSs0RxDakoWiA6dAiyQ6jRkHXrItEpD2kXqXMdMqgOHYISutQhJSFoIbcsFxTHaFFnUWtqmu3fvu/tYBD1nB+e00OGVy0AAABEJIRIxJyALRqUulmACd1+Q+zp/MrTucc/qabXH3tHN1REBARAtCWojDUVq0GNxSVljNHgaa1yuPFca1FZcnmyim+EgVMAcBxR76MVXmJ8iaeisVnwLJfdrVVm9aLeosoeV6yKpy+Q4VULEeFX1hEyFND3lLqlI4ycSVHQ1dSNBP/sVRxhdm7ffLBEwMphTijYGWcwMmqljEhfA7RW/Hw/xxVV5ZSFvBdY3ErYBaQ8E4Mju4k3wgmATeHeLs3Me0/WhT9+NgeerLvrihU3r8Glo4d2+IMBlCRdSMV+LGexmUvJFCVzsaPLcKxtZXdy2abBV77KF440fkwoThgWywPUoiJhxXx7W5YMyQWCi2Cffx1EFljUKD+QPjH1YDmsGl6V6a6yRreKZiYV9gd7i6qHZgY5YSDzsNKlMpPxnf2bbrXdP+t/Nt1hcL8Q/smFqg+a1JUdNw9dtmTuUXSAE0AJ8Kmjh4YqPN8TbDHasq+9xe+BxW6RWqyx46VqeXfDqePh7dfHr02uTZDnaw4W0oXC98DO6kYGPgcLo2/1pv0MiZWc+lqsVRfXAsDt6f6rI1cYoZwSYkn0ZDPNwg5SJZFfuzTTXYgr7Q3nN/u38gKMzI8NRB++jr90cTchlAwlLVXa9a5cSahkPrVwbqhzIT0DhKEULqYhgOmYhIBX8SEgInKVYkNQ3aR5ptZnzgy2rWSXfGoAEIGBBAkAmqYBgES5MRFJmU5IZeOJsc7nkWQ+qSteIR0ghMBf/vwGAAAEpfzwberMs/ZELqErukDxr/w/vwHqUFPWSozXywAAAABJRU5ErkJggg==">Ejemplo de Poiliticas de Privacidad de &lt;b&gt;Prideflags.org&lt;/b&gt; donde no se recopila información pero si sobre el proveedor de alojamiento. </A>
+            <DT><A HREF="https://nitter.tardis.systems/" ADD_DATE="1696899880"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACV0lEQVQ4jX2SzWoTURTH/+d+ZCZJJzJNmmpbU7BVED+omyoUSt1JcVEXgj6ALgo+gBvBtUtfwBcQxG6KrrUqiFQtCrWom6apaEzM7WQmc+9xUQsT2npX9x7O7/A751yJ/5y7wXT5one0uJLUdw7LUfsilZlgojZ5alvIzvfNjUUIFsHpWw+rxMHG+od1/HrdzqZT//26Hpk69rgTRfMMm2itNQAkSZKwgxcEhWdbTXMN3x7FABgAxC7LBIDH52bvubR1dWG2jPlLVX8i/ClPln/Lhbnj+cUb56HZXBkbO3f/H0yZFnZFHNxHKaj77v0nbZ1w0U6HAMBEa/zZV8zOjxlYO2gGDABJLllyVqeVkZp/4eywe/m2Sd0owsz0EG9u7cjN1XZsWj+WsozIzmKQVMnaHg1XCjx5okLFgkKp5GPqzCjVRkN21tJgMFDKMn1b6KbklBKoN3pUr1s2xqLVNniy/AUdk5LSAnEbLsuI7KNaLSLp9TBUreLO7Zs4EoboRIwXqwm2mw5aEZpR/9b7DLaNgVYKrVYHT5dX0G79QSUsYtTPw9kujGHk80B0aIGGQZiTWFtv4O6D5wjyFs72ICKNwGdQn+8BBYoAHANSEgq+B7guktQC6MHlGNT37w4oAABEBEXMEgaWHaQAcioGmJh5v8GeFANArMOEObWJBXe55EA5l1o4kxad0B5LYW1sKMkyewYEgD20azIXlpSUkEqBbQ7alxDKQ5w6OCEGgjKPm69o7DF9LfhMl2Wh9srZOLbOCVCeSBMsgE7KVvme57lkFsCbPeYvOQEIKCxVWn4AAAAASUVORK5CYII=">Una buena idea de un &lt;b&gt;502 - Bad Gateway &lt;/b&gt; ¡Buen texto!</A>
+            <DT><A HREF="https://fed.brid.gy/" ADD_DATE="1696900139"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABDElEQVQ4jd3RvU6UYRCG4Wve3eTDsCRQra2dhcHawsJTMNnGSALhAEjorLSxsDP2Jv6Um605BGuo7CwJBRsKlp/V7x0KSETCJkCHT3vPM7knw71PzEZZDC74UBL1ZivfZbkNu2SQQSRYzTnVM8UjIaVf9vywFadXZ+Oa8iZeYizslqLUqq9aEka+xMfLnb8Gr3JJ4zN+a733LXb+cX2dT3W9QWNi3TDG5waDfIiOeV8LP+vEhkNdfQ9UHbCvqo70/Oks+NSmx46taE3CWn4XXqgWhW2pEQrqxYkpBQraTjGt1XIWB1pbXafeajzReq7rUOBEXvuFOdEmphY0RlofzsEgezNfNyt36fynOQNLlFxESbrkmAAAAABJRU5ErkJggg==">&lt;b&gt;Interesante iniciativa de Fed.brid.gy&lt;/b&gt;Tu sitio web sirve como cuenta fediversa o usar la cuenta de Mastodon para copiar, publicar y responder publicaciones. </A>
+            <DT><A HREF="https://hellogreg.github.io/glytter/" ADD_DATE="1696900584"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAc0lEQVQ4jaVRMRLAIAxKvPrY+iAfW4d0iEc9SYe0TDlQA6hmJhkUERlNWXCSpZJ6/scFrB5N2YaTzs8LtVuYBKjdXi1B25bMyQjXGZCAfvmHFI7NItLz4POzYc3KuYOWwlpxLm6J+1kZn2dLsBsGXdV0rTdmB5Sr7WQIIQAAAABJRU5ErkJggg==">&lt;b&gt; Glytte &lt;/b&gt;: el captador de glifos de fuente</A>
+            <DT><A HREF="https://xn--sr8hvo.ws/" ADD_DATE="1696901028">Estar en IndieWeb Webring es para que las personas que agregan componentes básicos de IndieWeb a sus sitios web personales encuentren (y sean encontradas por) otras personas con componentes básicos de IndieWeb en sus sitios!</A>
+            <DT><A HREF="https://growth.design/auth/welcome" ADD_DATE="1696902137"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADiUlEQVQ4jS3B3W9TZRwH8O/vPOftOaenbGu3dutWNkLZeNlbYoKQNYAkGkWTRWIwMvFGMEoiF3rhNHFXXpnohX+Ad0YNBqOJQUNMlhAFDAPnBltwy9jGBuvari3teek5z+ONnw8BgGVZ4yD6KIyiQc45VzUNhq7BCyQN9wKfTKSkJ3QsbzZlKBQvk2mdL1aCz9+dmr5MjLFx23G+NznXVMak73mIopBMztHwgdePcRwfcfDdtTq2SkK6DRdOTKea54mHG+WzrD2d/sZ24hnTtJqk6YpqchIg6XsuhBB0coTjyrWqLO5osE1Gke8jasqoWvNZreEP0uQbJ+oO17mQhEojoM2KJytuQDfub+LIAGApDMsbOixDoFgsS89rUiQi6dgWAkFCPdCd4NmOFtKYIkGQTCHSFMJnP/yNZLKAzXUJbmoolwpYf1ym/t1p+cHEKcqPDuDy738p6tW7D5FJlPFsrpO8oIn59RJ6OxxoqkTQFCgUq2h4GtriMZw7lcebL45Re2cSG6sbGOnPQm0zGaSIEAkha35IVddHo2mj6QcYOmihUnLxYFni4qt57O/tgsN1zM8u4M9/FqEZnJR93Uk60J1A1PRJa+3CUt1EKpvDLg2wKIZjRzI499IYPMXAb/e20PCb4K0J3NxmaBhtUOMOR9KxoDEF7aqPd452Qg2LSNgWFCnBXBsDfWnw7j14vLAGRTfgyABvnRiCErpQ51YKMqYRdbZYUlE1yvUkUXvqIzIbeOXlPZi9GaBaauD5fAz5nn74QQCSIQ73xLG4GUC9s7KNQ4PDeFT2qFYuYH6jgkK5ig8vpNDbl4DBm7jyUwFb2zXEbB2Vah2absgH20+pWnclg6pO5brTlNu7VxpM4otvr9MzwzrOn9kPr0FoTbUg02djacGDbcTw650V+cetJdrcqaEnFQcN53rqc2tFrkDCsTR67/RuOXn+IKmGDdJNgJlgsRju310HK3VIGZpUWHsku7Jp/Hh7RqhvnxxcXC3XR6tu2IzCuppNa8QtLkk3KIwY1LgFMMANivKX6Vl6bui43NXbFa0UdtQ2M/4vyx/KPjFU9bTnutr0vSf4+udVXJ/ZptFDaaT2pTA3V8alyav49MsZWlwN5WhfCoPZTmYwEimHv4//jYPpNyw7Vk+3JwSgiY8vjgm/OCUvnD0sAUUkE23CiceFya36xAtHb3116cxrAPAf2F+J/55cdP0AAAAASUVORK5CYII=">Idea - Un random de contenido despues de una confirmación</A>
+            <DT><A HREF="https://www.amazon.com/shop/aaronparecki?ref=prof_o_infl" ADD_DATE="1696903051"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABy0lEQVQ4jY2TP2hTURjFf09zM1UbcGmID9xEFEyyCTo1b6uLxuCS1e4Fg4tuIlhczMMti0NwadOho9DNf7wpCCYdDEL7njWgiU87NOBxeGmavryKB+5wv8t3vnPuuRdJaUnPJO3o/7Ez7klbkp4AD5jC9vY2jUaDz70elmVxc2mJarVKAlaRFExTe56n08YoFVu1Wi1JSYCkwXTl3vKyUsao5DjqdDqT/XnbTiIYWJIGwPyhpiAI8H2f4XDIzzCk2WzSarUAGB0cxC0MZxR0u13li8UZCyljEhXMENypVJQyRvliUb7vq+66/yQ4Fdd0KLdcLpPNZmm325OzMAxnc4gryBcKk4klxzmWSN11T7Dw259UPM9TzraVMkY521bddVWuVLToOAq/B/rTeSl9WInWJIXNy/NcX4fMxaTHcoSt2zB3AdIZ+PQI7mqcwu5r6RXS+xUp9OMyj/BrV+qtST860tq52Dv40oJ3t6JJmRuw4IA5CwIsC/a2YG8Drq1H9f4buPpwaEkKgAUA+h58fAzfNqJGxv0Ac5eg8BxyJRiN0zBnvlqSngL3j3kddKH/FkbDiCFzBXKLSbeyiqLv/ELS/snmZ7A/7kn/BXFbL8ajtAhKAAAAAElFTkSuQmCC">Ideas -  Crea tu shop en Amazon</A>
+            <DT><A HREF="https://geniuslink.com/" ADD_DATE="1696904091"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACUElEQVQ4jY2TzUtUYRTGf+d93zujXsdx/BwizEUQVIRRhISbMjK0XLSQwDJp00LatmgbSP0JbvowJQiCkJRa2Ae4iggCCVq1kGoazevX1Myde+/bwrkmKNGzO+d9z8NzHs4jbMeMTaKWTyEyDHQBrZWXH8Ac1j4ganhNr5TiEdkans5nMeYWcBlLRgukHcERoRBaCqHFggdMEASj9LXk/hJM57NoM4bQD3A0pRlpS3IibahWwqIf8fJnmbEFn5wfgWWKMLhOX0tO88QmqPFvIwxh4XBK8/iIS0+Tg7XwK7LsdzU9jQ5NCcWLpTIhHECpJP13ZhVprxsYjBca3pPgYK3m/VrIuQ8bnHy3zs3PvwktnG00tFUpsAAMkva6DTAENADUaOF42gDwPO/zcS0EYH4jpBRZkkqoUlu2NQBDquI2AI6Aqzc/LJUt/4EuBWTjqhTBSjkCoCVRkfpvnqzaXhVDyxsvAOBiq8OZZod2V9FerdCyKwEGyAF7ARC4/9WnM23obXKY6nBZD6FaQVIJG+EOOTkDzAGX4s63YsTwfIHzzQ6d9YZaLbhauNDs7CZgTgHjwHLc0QoCCxPffUY+/eLafIFneb/ikaUYbalYBsYNq5lZ0t4kcAMgZYR7h1zqjLBSjqgzQkfKYATeegELRRvf7ySrmVnDgPhM50fRZh9Cf2RBAcfqNAnRRMCib3m64HP3S3FTweYpjzIg/o4wCVzJOFLfmlDUaiHAsuhbcqWIIGIF4dHOMMWYsUm0dxrLVYQubCXOUokzPCTMvNoe5z8WKdp6TcQSIQAAAABJRU5ErkJggg==">Nuevas ideas de negocio -- Geniuslink - URL Shortener for Creators and Affiliates</A>
+            <DT><A HREF="https://kit.co/" ADD_DATE="1696904109"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA30lEQVQ4jaWTPa6EMAyEv7XSca93hPTpU+cQtHCNSLlBxEm22oYO0eMt3oIIf9oVllLY8UzGjg3wB7wAFREFLs8q5/XB8vwWfEDyfHwcpmkCQERY+7Nt47P/EBHdJm9NRHaEa5JClnNOrbVLzBizxJ1z2xJ0R9B1ncYYFSjAqqohhN8IAPXeX4GPCVJKBdh7XygqfuSoaeM4Yq2laRoA+r6/bHKhIKWkwzAsL88qThq4LyHGWMgGNIRwSmK2cnLO5Jxp2xZj/q/rugagqqq9/rMRXsevcm6PMtxcJri5zm9VlBQBjBKF3AAAAABJRU5ErkJggg==">Nuevas ideas de negocio --- Kit</A>
+            <DT><A HREF="https://en.wikipedia.org/wiki/User:Aaronpk" ADD_DATE="1696904140"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABO0lEQVQ4jaWTMaoCMRCG/wnvDtELmHaxdAmIXcheZA9hYeMNxNZqsc81lu0X+2VLTzBj8V5C8uQ9UAcG5k+YP5kvhPATzCx4IZRSBAD0TnNuQu82J5NPmgFADcMAay2UUjifzwAA733S8zzDWgtrLeZ5xvV6xXK5hPcet9vte/5pmoSIJIQgURtj5HQ6CTOLc06maRJmFmaWuq5TjVg454qNrutEay0hBDkej8V6NC4M+r4XANL3fdo0xogxJul4UK4TxPV6Decc9vt9ArTb7XC/35MehgFVVZUUc7cQghCRjOOYTtNaS9d1wszStm3BgpnlKzfz3mO1WuFyuWCz2aBpGlhrcTgcsN1uAQCLxeLvG0RIRJRmjS9U13XB5wlinlrrgnTbtk/w/jWIDPL8PXvMzz9TzuLVZgB4AExRsO8ga8hoAAAAAElFTkSuQmCC">Ideas - agregar tu nombre a Wikipedia - User:Aaronpk - Wikipedia</A>
+            <DT><H3 class="searchable-item" ADD_DATE="1696925946" LAST_MODIFIED="0">Schema</H3>
+            <DL><p>
+                <DT><A HREF="https://developer.android.com/develop/ui/views/launch/shortcuts/creating-shortcuts" ADD_DATE="1696911000"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABvElEQVQ4jdWRTUtVYRDHfzPnuS95WwQlBSFZ2AstojZZ5kooWkUbP4PQyi8QHTVy6/doE66i1hm1iqAg7xVtI0VdCEu955znmWlxNbQCt/WHgWFmfvPCwD+j4dW8ueMKIHiu+GTWt1x/xffXAt4PjnXmJsbbs/MHDRpvz86PdeYmdtmA4DiyvrayNGRn7l1bvj/6VQbfHLdvV0V1GMDN1j7rkdfH/MtlUc6u68oMjiC49DtNZsjjdKOd39EsLJCATE5rPQBgZYTkq2RgZZx+cSFf3GWEHCXHrn/I74ZWY4HKTyHgVUJUUn8Dz6SWgQNBPsatYvrl+fwJOSoAo8szN+vN+lPNVN0cKyoTRPbe7rhro6aigiWzslfefnXuwXO50n40OCC2FFr1kbRZfBKRt4jccnPf20BUBPdn7n4pazVOxM2ys+U6pi2xqTBQH7GiigLRne7ObwzcwXd83J2uQLSiimGgPtISm5Lx9sN3eihctCKitYysWSP+KEBAkN31wSEcbpB6FVYltBGw7fg+IAzZdrWBCF4mj1Uyd8/64H7F772Eo4DYdgUiQ8Hjxkk4yt+A3/VnvnsA8V/oJ0TQ04LscsdWAAAAAElFTkSuQmCC">¡Schemas.android.com para Shorcuts, no las olvides!</A>
+                <DT><A HREF="https://developer.android.com/develop/ui/views/launch/shortcuts/creating-shortcuts#java" ADD_DATE="1696911244"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABvElEQVQ4jdWRTUtVYRDHfzPnuS95WwQlBSFZ2AstojZZ5kooWkUbP4PQyi8QHTVy6/doE66i1hm1iqAg7xVtI0VdCEu955znmWlxNbQCt/WHgWFmfvPCwD+j4dW8ueMKIHiu+GTWt1x/xffXAt4PjnXmJsbbs/MHDRpvz86PdeYmdtmA4DiyvrayNGRn7l1bvj/6VQbfHLdvV0V1GMDN1j7rkdfH/MtlUc6u68oMjiC49DtNZsjjdKOd39EsLJCATE5rPQBgZYTkq2RgZZx+cSFf3GWEHCXHrn/I74ZWY4HKTyHgVUJUUn8Dz6SWgQNBPsatYvrl+fwJOSoAo8szN+vN+lPNVN0cKyoTRPbe7rhro6aigiWzslfefnXuwXO50n40OCC2FFr1kbRZfBKRt4jccnPf20BUBPdn7n4pazVOxM2ys+U6pi2xqTBQH7GiigLRne7ObwzcwXd83J2uQLSiimGgPtISm5Lx9sN3eihctCKitYysWSP+KEBAkN31wSEcbpB6FVYltBGw7fg+IAzZdrWBCF4mj1Uyd8/64H7F772Eo4DYdgUiQ8Hjxkk4yt+A3/VnvnsA8V/oJ0TQ04LscsdWAAAAAElFTkSuQmCC">Haz que tu usuario tenga la experiencia en tu app al hacer que...Toque y mantenga presionado el ícono del iniciador de su aplicación para ver los accesos directos que define para su aplicación.</A>
+            </DL><p>
+            <DT><A HREF="https://www.namecheap.com/support/knowledgebase/article.aspx/9699/2237/how-to-set-url-frame-meta-tags-for-a-domain/" ADD_DATE="1696911332"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACRElEQVQ4jY2Sz0vUURTFP/d+33zV0WQaDcuooCyEaiUJGRSV6wL7SZuKokW7oEVBm8L+iDYhQZGQRKtWLpSIiNpEZGELiTDNmgbNGef7490WM5oWWAfe4r3HPeeee49MXmrPurj+hiM9kVqQ98aqUIFA0oIXeZTE5X7n4vob67LB9flISDwgqxNg4NTlG0O9NoOKE7PT85GnlPxDehkiD+CRxE47L7J2Ra15iCvgPbgQXGbZn0ESQeBIvMOr5BweT/C72BB02x6kIYtNjmPF6SrRInnrJigVIamAitfl5iReoNDVx+yp29RfuUfm8h1oykMSQ3kO2X0Qd/MpevQqpDGknt8EUYW0rYPg0DmiwBHPFtHOLoKeY1Ceg4Zm6L2Ab86BSNWiSI3ADNIE9p0ku6WT7Jf3pMN3AXD7zyDNLdjOA1hHNzY1iR+5v7RTB1SHtmUXwd4+lBR79QQbG8X39KGbt6O9Fym3d6IS4F48Rj+9hWwTGCgYJDHafQTZsBH5+BJ5N4rNFvAjD6pCh89TWt9J6dMH5NkgaLAUmKoFqV1K8zA8UPO8hvT5EH7sNS7XQsan+OEBdGocwvql0cn02a3f6wLLR2EjNLfC9EQ1rwgkEZJrQzbuwBZK+Ik3CAaihCpUzH44FEW1qvqzAK5uqT1ciBW/Yt8+gyqSqQNZtnmPOsGKTiQXaVDz9gdcZmUaF58V4tiKitnDxlDJOiHU/ztZJzSGCoEMOp+W+2fKKir+uJnm/d89rIACifeF8oINpcn8rV/IwuwZu6F6FgAAAABJRU5ErkJggg==">&lt;meta property=”og:title” content=”Este campo puede contener hasta 100 caracteres . según Namecheap?”/&gt;</A>
+            <DT><A HREF="https://www.namecheap.com/support/knowledgebase/article.aspx/9699/2237/how-to-set-url-frame-meta-tags-for-a-domain/" ADD_DATE="1696911552"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACRElEQVQ4jY2Sz0vUURTFP/d+33zV0WQaDcuooCyEaiUJGRSV6wL7SZuKokW7oEVBm8L+iDYhQZGQRKtWLpSIiNpEZGELiTDNmgbNGef7490WM5oWWAfe4r3HPeeee49MXmrPurj+hiM9kVqQ98aqUIFA0oIXeZTE5X7n4vob67LB9flISDwgqxNg4NTlG0O9NoOKE7PT85GnlPxDehkiD+CRxE47L7J2Ra15iCvgPbgQXGbZn0ESQeBIvMOr5BweT/C72BB02x6kIYtNjmPF6SrRInnrJigVIamAitfl5iReoNDVx+yp29RfuUfm8h1oykMSQ3kO2X0Qd/MpevQqpDGknt8EUYW0rYPg0DmiwBHPFtHOLoKeY1Ceg4Zm6L2Ab86BSNWiSI3ADNIE9p0ku6WT7Jf3pMN3AXD7zyDNLdjOA1hHNzY1iR+5v7RTB1SHtmUXwd4+lBR79QQbG8X39KGbt6O9Fym3d6IS4F48Rj+9hWwTGCgYJDHafQTZsBH5+BJ5N4rNFvAjD6pCh89TWt9J6dMH5NkgaLAUmKoFqV1K8zA8UPO8hvT5EH7sNS7XQsan+OEBdGocwvql0cn02a3f6wLLR2EjNLfC9EQ1rwgkEZJrQzbuwBZK+Ik3CAaihCpUzH44FEW1qvqzAK5uqT1ciBW/Yt8+gyqSqQNZtnmPOsGKTiQXaVDz9gdcZmUaF58V4tiKitnDxlDJOiHU/ztZJzSGCoEMOp+W+2fKKir+uJnm/d89rIACifeF8oINpcn8rV/IwuwZu6F6FgAAAABJRU5ErkJggg==">&lt;meta property=”og:tags” content=”Las palabras clave son conjuntos de palabras separadas por comas, donde cada palabra clave es relevante para el contenido de la página. Este campo puede contener hasta 250 caracteres .&quot;&gt;</A>
+            <DT><H3 class="searchable-item" ADD_DATE="1696925946" LAST_MODIFIED="0">HTML</H3>
+            <DL><p>
+                <DT><A HREF="https://developer.mozilla.org/es/docs/Web/HTML/Element/em" ADD_DATE="1696913930"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAACM0lEQVQ4jU2S30tUQRTHz5m5P+e6udAGrWjha/WWtGLZklIumwjVQ/W3BELQfyO95gqBmvkrfDFRelgtie3B8Mr+uPdy78yd08O4m/Mw8IXvfM+Zcz54ozRCRIg4uAEAEQEAAK5KY7CMHrg554iotdZaI6JlcQDM83xgsExGPwzb7Y6UUgjf8zytdbvdJiIhhOM4xsmD4Jp5gIh5LhcW5ufn60mctFotz/PevH09/ehhGIbn5+eWZQP0KyBimmblkZsfPrz3fN+2ra2dL5XKg8XFd1EUnf09Ozr6IYQvJVkmnjEWRb2ZmSfN5nGr9YdbHADqz2tbm9tSSc454uWnGfSPJpqbe7q9vZMkCWMcAKvV6tr6GuecIQMgAgQAZvrJsmykXJ6YuL/caIjAT+J4bHR8fPz2ysrnIBCa9GDUrN9PPDU1mWXZ3t7eUDDU7fZqtWfHzZOTk6bn+VrToJF+BZnW67Xd3W9KpZZtMc5nZ2dWV9eJFGfM7NPMnwGAlLI4XKxMVpY/LQNAHMW3xkbv3rvTaKwg2koprQkREAgAGOe814seV6dLpdLGxiaALaV8+erFRXixv//ddXzf9x3b0bqPQiAKWufF4vDXjc2Dg0PHcTudzq+fp0tLH09PfzuOHYbh4eFRt9vjnAMAlq6XETFJEqVUoVAgoCRO0jR1XVcIQURR1HNs13Ev0UBDK2MMEfM8N0NjjBHpPNcAwDknIsMiEf2n1SzSUKiUQkQjtdZXif4H9y5AmuLgRAoAAAAASUVORK5CYII=">&lt;p&gt;La etiqueta &lt;strong&gt; strong&lt;/strong&gt;  da mayor énfasis que &lt;em&gt;em&lt;/em&gt; &lt;/p&gt;</A>
+                <DT><A HREF="https://rockcontent.com/es/blog/tags-open-graph/" ADD_DATE="1696910799"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAClklEQVQ4jYWTP2hUWxDGf3Pu2b13b9ZVhBWJRnwQEBJEEcVKREsL9YEGbCwEQcV9aqErrwoiIWpjZeE/RC000UrBwuahWATstFER1MLwWExe3N27e+/ec+YVq6IQ8AdTDcPMx/eNgAqIUputElcOg+xB/RoEi9JHVMCkmOANee8hH/67yfRQB0AAqDdHsfEUoRkh6bYQ+Qh0f/T7xHg/TFyydNPnSLifCflXONRYQrX8gmK4nm6rztzCdW4MzbEYtWQ1Ye80Syt/0U4f8z7ca1kWHSSO1tNqTnCpcpGaVjj1ZRRfyLEIZJACNhQuP34LYyc40xwkGtjHmvZOizUH6KSOntxl/1RAOXtGtHwDmYL5piByEAVwdvdVJvUIJHcwsg/jxyzoRlw2R9L4zPSYp54+IMuf0uspxoB6QYwj0wKir0EUbX2i01UCu8VizABqZpnvdgDlQnh+Uf0/08q/UnYpYlZZEAUFRhyMG87WH2HtEM47UAMCIjk2KJKlT5iMzxAB4FA30PdandD4R2AEoIxKBVWHiKAqQI5qiJjSr6cYLKgggae6wsCOjEm2/1ZCD8USINK24BPUV1i5MgIy6skJTLgEzRTM90UeYy0+f8NEOEXRVhATIvLO4uUVQWEzRQYZ1xbd9CgDZh1Z1J/Xb1UCFrgFOk2QDBGXIGm/tGh+j7iylYV8jHE5R0230fu6lsznFHODKyhOlaYEzM+/hj8UbR5AEZxMCyfnlxGFM9hwmE5So/PpNldGW4tHebZKVD5Jufw3SfKUmXhXP2qn25uISvexMkyn+wWRD6AOlQwQRAsgRVSHiaMynd4MUviTCZmVH+98vDFIHB/DmN14twrUIBhUFFQRcZjgPV7v02hf42a1CfA/OjkWtZBaAe0AAAAASUVORK5CYII=">&lt;meta name=”twitter:image” content=”adaptarte una resolución mayor de 280x150 píxeles y que no supere los 1MB&quot;&gt;</A>
+            </DL><p>
+            <DT><H3 class="searchable-item" ADD_DATE="1696925946" LAST_MODIFIED="0">Codigo de conducta</H3>
+            <DL><p>
+                <DT><A HREF="https://queerjs.com/code-of-conduct/" ADD_DATE="1696916454">QueerJS - Code Of Conduct</A>
+            </DL><p>
+            <DT><H3 class="searchable-item" ADD_DATE="1696925946" LAST_MODIFIED="0">Ideas buenas que se pueden replicar</H3>
+            <DL><p>
+                <DT><A HREF="https://opencollective.com/queerjs" ADD_DATE="1696916697"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAC1ElEQVQ4jXVTTWhcVRg953v3vvdmJhGxIhZJRIymTaSCorRChYB2IaWCofgDxaKQgOCuUKRGX81GiCgVBOOiCGJBSrFkIeIPKUit4E9cOAjFWJlGKOgmM85k3n333s/FaJMuctbnHM75Pg4BAFACVAAoznUeFZM+D8E+9f42gFGs+TN4/23o9z6cf+bW77fyif9wZOFaY3zXzW9qxCwoNsYASjKwjwEgYUyiMYbjrx7M3jp5AUkxRW9QFFJMvFRnOrxk82yqu94Jad4AQrWhkVcBFWi8I63Xa1XpriQqX5NUAB4ABEURJbtpIW/kU912p0yMSYKv3vEhPnTl50v3/91au8+r7vOVX2DlDp44lP70WbMzsfxb/xgA8LVznSljzFfeV9GmuTrnjs5PD53BNvjycrlbIj+1mR3v9jcekcSYFykJ07xhQoin5qeHzsws/mChev0+UGXR1BRQUnG41rDjlfPRSjIrpDysMcBXrgdiEar8YPZBj0HPAUgtJlEBVIp+3P3HtaFKAfdKcG4EEBK82lxZbQ2EW8SbLgoA768s/SFkCyKsfNgpysEzSQAT2zW/EapKIZXQKCZNW9CoqnF0HCN3Dbpv6b8pIwC8sOfQmEJHYwww1q4JYvyOFCY2q5nMzIDUmcUfzQ0mqiyasIDSqD7bGMqGQaoP4SLnzrb3G2suxBCiSTOtXHnkjenhT7aL/3lTxwzL8ya1k72y/wAB4ORS7928Xnu5u94pk8RairztvDu9vvzN79d23KmTe8buTTJ5DmX8aO6p7NcvVvv3SIkDj03k7xFFIcXO13PeXp7P69nj3fV2zPIh8d51KWypghrjaF6v1StXrZrEHn7lCa78n0hQFLGYZe+X8q8nXb86ZdLMR/UA0ABkN8ldJOplv4SI3B3jxgFVZbGsBri+xs15zp1t77epPSqJ7PXOjQBAYtM1jbhU9bun55++5eJW/r+lUVi5mhQUqgAAAABJRU5ErkJggg==">Solicitar patrocinio en Open Collective</A>
+            </DL><p>
+            <DT><H3 class="searchable-item" ADD_DATE="1696925946" LAST_MODIFIED="0">Nuevos negocios / grupos</H3>
+            <DL><p>
+                <DT><A HREF="https://queerjs.com/" ADD_DATE="1696916576">QueerJS es una serie de reuniones donde se anima a todos a asistir y apoyar a los oradores y la idea.</A>
+            </DL><p>
+            <DT><H3 class="searchable-item" ADD_DATE="1696925946" LAST_MODIFIED="0">Desing</H3>
+            <DL><p>
+                <DT><A HREF="https://primer.style/design/" ADD_DATE="1696918438"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACj0lEQVQ4jWWSTWhdVRSFv3XO7XsvT2usMVFiU2MH4qATQZxURTQTRzrpxFlAKzirKKRq4Yom/kUHoi0acCYOOtCBIkKNIsEMOunMgYr5wdQkxJ+2r7l5996zHOS9GOiGDWezWQvWt48AwAIZ4J43/EgdmQziYcwRAMQKiQUlPv39Vf24XyN6NZq7faDFWxLPKtByBYZauwZREVxTGObKgqm1XNd3Vzjc8SIDrSF/GduacBdI4AREEOAaCKAIakDd4UKxxVPrs2wHUGoOMZ0NaqLu8J27TBoWgStOXEqJS8C/mIsumaw7fJMNMtEcYhqUdGTGx4OYD21ifS19svxKfJ7creE2t26Oswkw8gu3bzS4xkvq3D3jd+NNnErbVK54LEM8Q6DhElCoOeFIzs4m+rPPZwPWweKEo4VTSSQQHTgZBA8hnCo63chZzqvusdkDvPc+r3qn4hwV/yAscTwIxno01y7/xq+7AqX+WXuz+/P6mdeWMSva1YxlGPX64KFDtP+2r6D94v1lcZKWzSAJAQTDqo0VufPgLTyIZHJnN0R41BnIY0d5gMhhGxtWg2FBEQxXQ2BudMb3kau6IcIPqu6a8b3BfCShEJDFQqjhY4FSl1mL+WaLn8ff9tejb/r+vnxs2sfG3/FnGSyGjGNK1ClRC+bCHy9rMZXpXBwgd5f36PI+5mbE1l6AQEHiaQVuSxXXNcABJ84uT+mnAA7qhhdcshhbfNGt+Wqn5tTaFKt9g3KLyyRWAYcB2vU2F3b+4jQ4BFBaylUsFTzumu8bTeYbgYsj04z0DZpDNIBhIiltpw/LgifXZ9UBpWyPcq5iCZ47/Lo/zyJPbJRc7RusbFCMD/OBK75dPh3n//9c8n/ylC3w1YfwBAAAAABJRU5ErkJggg==">&lt;b&gt;Primer&lt;/b&gt; es un conjunto de pautas, principios y patrones para diseñar y crear interfaces de usuario en GitHub. Proporciona un lenguaje compartido y un enfoque estandarizado para brindar experiencias cohesivas.</A>
+            </DL><p>
+            <DT><H3 class="searchable-item" ADD_DATE="1696925946" LAST_MODIFIED="0">Accessibility</H3>
+            <DL><p>
+                <DT><A HREF="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions" ADD_DATE="1696919949"class="searchable-item"  ICON="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAACM0lEQVQ4jU2S30tUQRTHz5m5P+e6udAGrWjha/WWtGLZklIumwjVQ/W3BELQfyO95gqBmvkrfDFRelgtie3B8Mr+uPdy78yd08O4m/Mw8IXvfM+Zcz54ozRCRIg4uAEAEQEAAK5KY7CMHrg554iotdZaI6JlcQDM83xgsExGPwzb7Y6UUgjf8zytdbvdJiIhhOM4xsmD4Jp5gIh5LhcW5ufn60mctFotz/PevH09/ehhGIbn5+eWZQP0KyBimmblkZsfPrz3fN+2ra2dL5XKg8XFd1EUnf09Ozr6IYQvJVkmnjEWRb2ZmSfN5nGr9YdbHADqz2tbm9tSSc454uWnGfSPJpqbe7q9vZMkCWMcAKvV6tr6GuecIQMgAgQAZvrJsmykXJ6YuL/caIjAT+J4bHR8fPz2ysrnIBCa9GDUrN9PPDU1mWXZ3t7eUDDU7fZqtWfHzZOTk6bn+VrToJF+BZnW67Xd3W9KpZZtMc5nZ2dWV9eJFGfM7NPMnwGAlLI4XKxMVpY/LQNAHMW3xkbv3rvTaKwg2koprQkREAgAGOe814seV6dLpdLGxiaALaV8+erFRXixv//ddXzf9x3b0bqPQiAKWufF4vDXjc2Dg0PHcTudzq+fp0tLH09PfzuOHYbh4eFRt9vjnAMAlq6XETFJEqVUoVAgoCRO0jR1XVcIQURR1HNs13Ev0UBDK2MMEfM8N0NjjBHpPNcAwDknIsMiEf2n1SzSUKiUQkQjtdZXif4H9y5AmuLgRAoAAAAASUVORK5CYII=">ARIA live regions - Normally, only aria-live=&quot;polite&quot; is used. Accessibility / &lt;div id=&quot;js-global-screen-reader-notice&quot; class=&quot;sr-only&quot; aria-live=&quot;polite&quot;&gt;&lt;/div&gt;</A>
+            </DL><p>
+        </DL><p>
+    </DL><p>
+</DL><p>
+
+
+
+
+
+<table class="searchable " style="display:none">
+  <thead class="searchable-item">
+    <tr class="header" id="theader">
+      <th id="nameColumnHeader" tabindex=0 role="button">Name</th>
+    </tr>
+  </thead>
+  <tbody id="tbody" >
+  </tbody>
+</table>
+
+
+
+</main>
+</body>
+
+</html>
+<script>"use strict";
+// Copyright 2012 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+var loadTimeData;class LoadTimeData{constructor(){this.data_=null}set data(value){expect(!this.data_,"Re-setting data.");this.data_=value}valueExists(id){return id in this.data_}getValue(id){expect(this.data_,"No data. Did you remember to include strings.js?");const value=this.data_[id];expect(typeof value!=="undefined","Could not find value for "+id);return value}getString(id){const value=this.getValue(id);expectIsType(id,value,"string");return value}getStringF(id,var_args){const value=this.getString(id);if(!value){return""}const args=Array.prototype.slice.call(arguments);args[0]=value;return this.substituteString.apply(this,args)}substituteString(label,var_args){const varArgs=arguments;return label.replace(/\$(.|$|\n)/g,(function(m){expect(m.match(/\$[$1-9]/),"Unescaped $ found in localized string.");return m==="$$"?"$":varArgs[m[1]]}))}getBoolean(id){const value=this.getValue(id);expectIsType(id,value,"boolean");return value}getInteger(id){const value=this.getValue(id);expectIsType(id,value,"number");expect(value===Math.floor(value),"Number isn't integer: "+value);return value}overrideValues(replacements){expect(typeof replacements==="object","Replacements must be a dictionary object.");for(const key in replacements){this.data_[key]=replacements[key]}}}function expect(condition,message){if(!condition){throw new Error("Unexpected condition on "+document.location.href+": "+message)}}function expectIsType(id,value,type){expect(typeof value===type,"["+value+"] ("+id+") is not a "+type)}expect(!loadTimeData,"should only include this file once");loadTimeData=new LoadTimeData;window.loadTimeData=loadTimeData;console.warn("crbug/1173575, non-JS module files deprecated.");</script><script>loadTimeData.data = {"header":"Index of LOCATION","headerName":"Name","language":"en","parentDirText":"[parent directory]","textdirection":"ltr"};</script><script>start("C:\\Users\\Luis Ángel\\Documents\\git-luisangelmaciel\\Igglybuff\\svg\\wowasome\\");</script>
+<script class="searchable-item" >onHasParentDirectory();</script>
+<script class="searchable-item">addRow("address-book.svg","address-book.svg",0,593,"593 B",1662057214,"9/1/22, 1:33:34 PM");</script>
+<script class="searchable-item">addRow("address-card.svg","address-card.svg",0,693,"693 B",1662057214,"9/1/22, 1:33:34 PM");</script>
+<script class="searchable-item">addRow("adjust.svg","adjust.svg",0,239,"239 B",1662057214,"9/1/22, 1:33:34 PM");</script>
+
+<script>addRow("youtube-square.svg","youtube-square.svg",0,526,"526 B",1662057216,"9/1/22, 1:33:36 PM");</script>
+<script>addRow("youtube.svg","youtube.svg",0,550,"550 B",1662057216,"9/1/22, 1:33:36 PM");</script>
+<script >addRow("zhihu.svg","zhihu.svg",0,1544,"1.5 kB",1662057216,"9/1/22, 1:33:36 PM");</script>
+
+<script>
+  ;(function search () {
+    ;[...document.querySelectorAll('.searchable')].forEach(makeSearchable)
+    function makeSearchable ($searchable) {
+      const $searchableItems = [...$searchable.querySelectorAll('.searchable-item')]
+      const $search = $searchable.querySelector('input')
+      $search.addEventListener('keyup', (e) => {
+        $searchableItems.forEach(function ($el) {
+          const text = $el.getAttribute('data-search') || $el.innerText
+          const show = new RegExp(e.target.value, 'i').test(text)
+          $el.style.display = show ? '' : 'none'
+        })
+      })
+    }
+  })()
+</script>
